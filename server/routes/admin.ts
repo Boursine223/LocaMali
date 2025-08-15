@@ -7,6 +7,11 @@ import { requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
+// Diagnostics: verify admin router is mounted
+router.get('/ping', (_req, res) => {
+  res.json({ ok: true, route: 'admin/ping' });
+});
+
 // Shared login handler (DB first, fallback to ENV)
 async function loginHandler(req: any, res: any) {
   try {

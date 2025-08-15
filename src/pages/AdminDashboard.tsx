@@ -36,8 +36,13 @@ const AdminDashboard = () => {
 
   const loadVendeurs = async () => {
     try {
-      const { data } = await api.get<Vendeur[]>("/admin/vendeurs");
-      setVendeurs(data);
+      const { data } = await api.get("/admin/vendeurs");
+      if (Array.isArray(data)) {
+        setVendeurs(data as Vendeur[]);
+      } else {
+        setVendeurs([]);
+        toast({ title: "Erreur", description: "Réponse inattendue du serveur (vendeurs)", variant: "destructive" });
+      }
     } catch (e: any) {
       toast({ title: "Erreur", description: e?.response?.data?.error || "Chargement impossible", variant: "destructive" });
     } finally {

@@ -12,6 +12,7 @@ import AddVendeur from "./pages/AddVendeur";
 import ClientsList from "./pages/ClientsList";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -33,19 +34,21 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/localiser/:lienUnique" element={<ClientRegistration />} />
-            <Route path="/l/:lienUnique" element={<ClientRegistration />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/add" element={<ProtectedRoute><AddVendeur /></ProtectedRoute>} />
-            <Route path="/admin/clients" element={<ProtectedRoute><ClientsList /></ProtectedRoute>} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/localiser/:lienUnique" element={<ClientRegistration />} />
+              <Route path="/l/:lienUnique" element={<ClientRegistration />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/add" element={<ProtectedRoute><AddVendeur /></ProtectedRoute>} />
+              <Route path="/admin/clients" element={<ProtectedRoute><ClientsList /></ProtectedRoute>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
   );

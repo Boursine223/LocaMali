@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../prisma';
+import dayjs from 'dayjs';
 
 const router = Router();
 
@@ -17,18 +18,10 @@ const handleGetByToken = async (req: any, res: any) => {
   const vendeur = livreur?.vendeur;
   if (!vendeur) return res.status(404).json({ error: 'Vendeur introuvable' });
 
-  const now = new Date();
-  const debut = vendeur.dateDebut ? new Date(vendeur.dateDebut as any) : undefined;
-  const fin = vendeur.dateFin ? new Date(vendeur.dateFin as any) : undefined;
-  const withinDates = (!debut || now >= debut) && (!fin || now <= fin);
-  const isActive = Boolean(vendeur.actif) && withinDates;
+  // Simplified rule: if vendeur.actif is true, the service is considered active.
+  const isActive = Boolean(vendeur.actif);
   if (!isActive) {
-    const reason = !Boolean(vendeur.actif)
-      ? 'inactive'
-      : (!withinDates && fin && now > fin)
-        ? 'expired'
-        : 'not_started';
-    return res.status(403).json({ error: 'Service indisponible', reason });
+    return res.status(403).json({ error: 'Service indisponible', reason: 'inactive' });
   }
 
   // Increment clicks for this link token
