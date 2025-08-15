@@ -121,7 +121,12 @@ const ClientRegistration = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-strong animate-fade-in">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl">LocaMali</CardTitle>
+          <CardTitle className="text-2xl">
+            <span className="inline-flex items-center justify-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              LocaMali
+            </span>
+          </CardTitle>
           <CardDescription>
             Partagez votre position pour que nous puissions vous localiser
           </CardDescription>
@@ -157,6 +162,10 @@ const ClientRegistration = () => {
                   <li>En cas d'échec, réessayez depuis Chrome/Safari et autorisez la position.</li>
                 </ul>
               </div>
+            </div>
+
+            <div className="text-center text-[11px] text-muted-foreground opacity-70">
+              Assistance WhatsApp: <a href="https://wa.me/22384054004" target="_blank" rel="noreferrer" className="underline underline-offset-2">+223 84 05 40 04</a>
             </div>
           </div>
         </CardContent>

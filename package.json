@@ -15,7 +15,8 @@
     "preview": "vite preview",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "set:admin": "tsx server/scripts/setAdmin.ts"
+    "set:admin": "tsx server/scripts/setAdmin.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

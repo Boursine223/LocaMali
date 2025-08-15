@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// In production (Vercel), use same-origin so frontend calls /api on the same domain
+// In development, use VITE_API_URL if provided, else default localhost:4000
+const API_BASE = import.meta.env.PROD
+  ? ''
+  : (import.meta.env.VITE_API_URL || 'http://localhost:4000');
 
 export const api = axios.create({
   baseURL: `${API_BASE}/api`,

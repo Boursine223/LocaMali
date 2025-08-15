@@ -1,0 +1,13 @@
+# Keep backend for serverless functions deployment
+# Exclude dev-only files from Vercel upload to stay within free limits
+supabase_init.sql
+bun.lockb
+.eslintrc*
+*.log
+**/*.map
+.vscode/
+.git/
+**/__tests__/**
+**/*.test.*
+# Keep only the built assets
+!/dist
