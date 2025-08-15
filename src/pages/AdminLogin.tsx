@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { api, setAuthToken } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -21,11 +21,10 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { data } = await api.post("/admin/login", {
+      await api.post("/session", {
         email: formData.email,
         password: formData.password,
       });
-      setAuthToken(data.token);
       toast({ title: "Connexion réussie", description: "Bienvenue dans l'interface admin." });
       navigate("/admin/dashboard");
     } catch (err: any) {

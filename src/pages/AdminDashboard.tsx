@@ -14,7 +14,7 @@ import {
   Calendar,
   Phone
 } from "lucide-react";
-import { api, setAuthToken } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 type Vendeur = {
@@ -76,8 +76,9 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
-    setAuthToken(undefined);
-    navigate("/admin/login");
+    api.delete('/session').finally(() => {
+      navigate("/admin/login");
+    });
   };
 
   const totalClients = vendeurs.reduce((sum, v) => sum + (v.livreurs?.length || 0), 0);

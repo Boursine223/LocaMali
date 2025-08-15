@@ -7,20 +7,42 @@ import { requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
-// POST /api/admin/login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body as { email: string; password: string };
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminHash = process.env.ADMIN_PASSWORD_HASH;
-  if (!adminEmail || !adminHash) return res.status(500).json({ error: 'Admin not configured' });
-  if (email !== adminEmail) return res.status(401).json({ error: 'Invalid credentials' });
+// Shared login handler (DB first, fallback to ENV)
+async function loginHandler(req: any, res: any) {
+  try {
+    const { email, password } = req.body as { email: string; password: string };
+    if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis' });
 
-  const ok = await bcrypt.compare(password, adminHash);
-  if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(500).json({ error: 'JWT secret manquant' });
 
-  const token = jwt.sign({ email }, process.env.JWT_SECRET as string, { expiresIn: '30d' });
-  return res.json({ token });
-});
+    // 1) Try DB-backed Admin first
+    const admin = await prisma.admin.findUnique({ where: { email } }).catch(() => null);
+    if (admin) {
+      const ok = await bcrypt.compare(password, admin.passwordHash);
+      if (!ok) return res.status(401).json({ error: 'Identifiants invalides' });
+      const token = jwt.sign({ email: admin.email }, jwtSecret, { expiresIn: '30d' });
+      return res.json({ token, source: 'db' });
+    }
+
+    // 2) Fallback to ENV admin (backward compatibility)
+    const envEmail = process.env.ADMIN_EMAIL;
+    const envHash = process.env.ADMIN_PASSWORD_HASH;
+    if (!envEmail || !envHash) return res.status(401).json({ error: 'Identifiants invalides' });
+    if (email !== envEmail) return res.status(401).json({ error: 'Identifiants invalides' });
+    const ok = await bcrypt.compare(password, envHash);
+    if (!ok) return res.status(401).json({ error: 'Identifiants invalides' });
+    const token = jwt.sign({ email: envEmail }, jwtSecret, { expiresIn: '30d' });
+    return res.json({ token, source: 'env' });
+  } catch (err) {
+    console.error('Login error', err);
+    return res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
+// POST /api/login and /api/connexion (plus their /api/admin/* aliases)
+router.post('/login', loginHandler);
+router.post('/connexion', loginHandler);
 
 // Vendeurs CRUD
 router.get('/vendeurs', requireAdmin, async (_req, res) => {

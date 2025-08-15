@@ -10,17 +10,23 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddVendeur from "./pages/AddVendeur";
 import ClientsList from "./pages/ClientsList";
-import { useEffect } from "react";
-import { loadAuthTokenFromStorage, hasAuthToken } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  useEffect(() => {
-    loadAuthTokenFromStorage();
-  }, []);
   const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-    return hasAuthToken() ? children : <Navigate to="/admin/login" replace />;
+    const [status, setStatus] = useState<'loading' | 'ok' | 'no'>('loading');
+    useEffect(() => {
+      let mounted = true;
+      api.get('/session')
+        .then(() => mounted && setStatus('ok'))
+        .catch(() => mounted && setStatus('no'));
+      return () => { mounted = false };
+    }, []);
+    if (status === 'loading') return <div />; // minimal skeleton
+    return status === 'ok' ? children : <Navigate to="/admin/login" replace />;
   };
   return (
     <QueryClientProvider client={queryClient}>
